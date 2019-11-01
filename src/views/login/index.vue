@@ -84,9 +84,9 @@ export default {
               // 跳转到首页
               this.$router.push('/')
             })
-            .catch(err => {
+            .catch(() => {
               // 失败 进行提示
-              console.log(err)
+              this.$message.error('手机号或验证码错误')
             })
         }
       })
