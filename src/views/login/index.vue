@@ -33,6 +33,9 @@
 </template>
 
 <script>
+// 用封装local模块，本地存储用户信息   src/utils/新建local.js
+// 导入
+import local from '@/utils/local'
 export default {
   // 补充依赖的数据
   data () {
@@ -50,8 +53,8 @@ export default {
     }
     return {
       loginForm: {
-        mobile: '',
-        code: ''
+        mobile: '15810245405',
+        code: '246810'
       },
       //   校验规则
       loginRules: {
@@ -73,21 +76,38 @@ export default {
   methods: {
     login () {
       // 获取表单组件实例 ---> 调用校验函数
-      this.$refs['loginForm'].validate(valid => {
+      this.$refs['loginForm'].validate(async valid => {
         if (valid) {
           // 发请求 校验手机号和验证码  后台
           // 接口文档2.1
-          this.$http
-            .post('authorizations', this.loginForm)
-            .then(res => {
-              // 成功
-              // 跳转到首页
-              this.$router.push('/')
-            })
-            .catch(() => {
-              // 失败 进行提示
-              this.$message.error('手机号或验证码错误')
-            })
+          // this.$http
+          //   .post('authorizations', this.loginForm)
+          //   .then(res => {
+          // 成功    跳转到首页
+          // 保存用户信息（包含token ：sessionStorage）大量调用，所以封装，然后在utlis/新建local.js
+          // 拿响应主体
+          // local.setUser(res.data.data)
+          // this.$router.push('/')
+          // })
+          // .catch(() => {
+          //   // 失败 进行提示
+          //   this.$message.error('手机号或验证码错误')
+          // })
+
+          // try{} catch(错误对象：异常的意思：exception) {}
+          // 当一段代码不能保证一定没有报错try {捕获 异常} catch (e) {处理 异常} 捕获异常处理异常
+          try {
+            // 成功
+            // 就能拿到成功的结果   { 响应主体: { 用户信息 } }
+            const { data: { data } } = await this.$http.post('authorizations', this.loginForm)
+            // 保存用户信息
+            local.setUser(data)
+            // 跳到首页
+            this.$router.push('/')
+          } catch (e) {
+            // 出现异常  处理 提示错误信息
+            this.$message.error('手机号或验证码错误')
+          }
         }
       })
     }
